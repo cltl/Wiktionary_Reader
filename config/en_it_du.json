@@ -1,0 +1,12 @@
+{
+  "translation_languages" :{"en": "English",
+                            "nl": "Dutch",
+                            "it": "Italian"},
+
+  "language2info" : {
+    "English" : {"namespace" : "https://en.wiktionary.org/wiki/", "short_namespace" : "WIKT-EN"},
+    "Dutch" : {"namespace" : "https://nl.wiktionary.org/wiki/", "short_namespace" : "WIKT-DU"},
+    "Italian" : {"namespace" : "https://it.wiktionary.org/wiki/", "short_namespace" : "WIKT-IT"}
+  },
+  "paths_info" : {"English" : "output/wikt.words.tmp"}
+}
