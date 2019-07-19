@@ -35,90 +35,91 @@ output_path = out_folder / 'wiktionary_obj.p'
 verbose= int(arguments['--verbose'])
 
 settings = json.load(open(arguments['--config_path']))
-loop_info = settings['paths_info']
 language2info = settings['language2info']
 translation_languages = settings['translation_languages']
 
 # loop data
 wikt_obj = Wiktionary()
 
-for source_lang, path in loop_info.items():
-    namespace = language2info[source_lang]['namespace']
-    short_namespace = language2info[source_lang]['short_namespace']
 
-    with open(path) as infile:
-        for line in infile:
-            info = json.loads(line)
+with open(settings['wikt_words_path']) as infile:
+    for line in infile:
+        info = json.loads(line)
 
-            # check lemma
-            lemma = info['word']
 
-            # check language
-            if 'lang' not in info:  # mostly redirects
-                if verbose >= 3:
-                    print('lemma has no language')
-                continue
+        # check lemma
+        lemma = info['word']
 
-            lang = info['lang']
-            if lang != source_lang:
-                if verbose >= 3:
-                    print(f'skipping {lemma} with lang: {lang}')
-                continue
+        # check language
+        if 'lang' not in info:  # mostly redirects
+            if verbose >= 3:
+                print('lemma has no language')
+            continue
 
-            # check pos
-            wikt_pos = info['pos']
-            fn_pos = map_wikt_pos2fn_pos(wikt_pos)
+        lang = info['lang']
+        if lang not in language2info:
+            if verbose >= 3:
+                print(f'skipping {lemma} with lang: {lang}')
+            continue
 
-            if fn_pos is None:
-                if verbose >= 3:
-                    print(f'skipping lemma with pos: {wikt_pos}')
-                continue
+        source_lang = lang
+        namespace = language2info[source_lang]['namespace']
+        short_namespace = language2info[source_lang]['short_namespace']
 
-            key = (source_lang, lemma, fn_pos)
-            lemma_obj = LemmaPos(namespace, short_namespace, lang, lemma, wikt_pos, fn_pos)
-            wikt_obj.lang_lemma_pos2lemma_pos_objs[key].append(lemma_obj)
+        # check pos
+        wikt_pos = info['pos']
+        fn_pos = map_wikt_pos2fn_pos(wikt_pos)
 
-            # senses
-            if 'senses' in info:
-                for sense_info in info['senses']:
-                    if 'glosses' in sense_info:
-                        idiomatic = False
-                        if 'tags' in sense_info:
-                            if 'idiomatic' in sense_info['tags']:
-                                idiomatic = True
+        if fn_pos is None:
+            if verbose >= 3:
+                print(f'skipping lemma with pos: {wikt_pos}')
+            continue
 
-                        sense_obj = Sense(namespace,
-                                          short_namespace,
-                                          lang,
-                                          lemma,
-                                          wikt_pos,
-                                          fn_pos,
-                                          glosses=sense_info['glosses'],
-                                          idiomatic=idiomatic)
+        key = (source_lang, lemma, fn_pos)
+        lemma_obj = LemmaPos(namespace, short_namespace, lang, lemma, wikt_pos, fn_pos)
+        wikt_obj.lang_lemma_pos2lemma_pos_objs[key].append(lemma_obj)
 
-                        lemma_obj.senses.append(sense_obj)
+        # senses
+        if 'senses' in info:
+            for sense_info in info['senses']:
+                if 'glosses' in sense_info:
+                    idiomatic = False
+                    if 'tags' in sense_info:
+                        if 'idiomatic' in sense_info['tags']:
+                            idiomatic = True
 
-            lemma_obj.set_sense_ranks()
+                    sense_obj = Sense(namespace,
+                                      short_namespace,
+                                      lang,
+                                      lemma,
+                                      wikt_pos,
+                                      fn_pos,
+                                      glosses=sense_info['glosses'],
+                                      idiomatic=idiomatic)
 
-            # translations
-            if 'translations' in info:
-                for translation_info in info['translations']:
-                    target_lang = translation_info['lang']
-                    if 'sense' in translation_info:
-                        if target_lang in translation_languages:
-                            target_lang = translation_languages[target_lang]
-                            target_lemma = translation_info['word']
-                            target_namespace = language2info[target_lang]['namespace']
-                            translation_id = f'{target_namespace}{target_lemma}#{wikt_pos.title()}'
+                    lemma_obj.senses.append(sense_obj)
 
-                            translation_obj = Translation(lang=target_lang,
-                                                          lemma=target_lemma,
-                                                          wikt_pos=wikt_pos,
-                                                          fn_pos=fn_pos,
-                                                          translation_id=translation_id,
-                                                          gloss=translation_info['sense'])
+        lemma_obj.set_sense_ranks()
 
-                            lemma_obj.translations.append(translation_obj)
+        # translations
+        if 'translations' in info:
+            for translation_info in info['translations']:
+                target_lang = translation_info['lang']
+                if 'sense' in translation_info:
+                    if target_lang in translation_languages:
+                        target_lang = translation_languages[target_lang]
+                        target_lemma = translation_info['word']
+                        target_namespace = language2info[target_lang]['namespace']
+                        translation_id = f'{target_namespace}{target_lemma}#{wikt_pos.title()}'
+
+                        translation_obj = Translation(lang=target_lang,
+                                                      lemma=target_lemma,
+                                                      wikt_pos=wikt_pos,
+                                                      fn_pos=fn_pos,
+                                                      translation_id=translation_id,
+                                                      gloss=translation_info['sense'])
+
+                        lemma_obj.translations.append(translation_obj)
 
 wikt_obj.merge_lemma_objs()
 wikt_obj.create_translation_dict()

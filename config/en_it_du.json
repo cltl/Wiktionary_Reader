@@ -8,5 +8,5 @@
     "Dutch" : {"namespace" : "https://nl.wiktionary.org/wiki/", "short_namespace" : "WIKT-DU"},
     "Italian" : {"namespace" : "https://it.wiktionary.org/wiki/", "short_namespace" : "WIKT-IT"}
   },
-  "paths_info" : {"English" : "output/wikt.words.tmp"}
+  "wikt_words_path" : "output/wikt.en_du_it.words.tmp"
 }
