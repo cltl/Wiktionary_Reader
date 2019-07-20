@@ -85,6 +85,14 @@ class Wiktionary:
             self.lang_lemma_pos2lemma_pos_obj[key] = chosen_lemma_obj
 
     def create_translation_dict(self):
+        """
+        we assume that there only exist translations from
+        English -> other language
+
+        for each translation from English -> target language,
+        we store both source -> target and target -> source
+
+        """
         src_lang_lemma_fnpos_target_lang2translations = defaultdict(set)
 
         for lemma_obj in self.lang_lemma_pos2lemma_pos_obj.values():
@@ -98,8 +106,14 @@ class Wiktionary:
                 target_lemma = translation_obj.lemma
                 target_fnpos = translation_obj.fn_pos
 
+                # from English to other language
                 key = (src_lang, src_lemma, src_fn_pos, target_lang)
                 value = (target_lemma, target_fnpos)
+                src_lang_lemma_fnpos_target_lang2translations[key].add(value)
+
+                # from other language to English
+                key = (target_lang, target_lemma, target_fnpos, src_lang)
+                value = (src_lemma, src_fn_pos)
                 src_lang_lemma_fnpos_target_lang2translations[key].add(value)
 
 

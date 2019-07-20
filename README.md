@@ -32,6 +32,7 @@ python load_wiktionary.py -h
 4. Check `how_to_use.py` for an example of how to use
 
 ## TODO
+* the extractor seems to only capture translations from English to other languages, not from other languages to English.
 * extend part of speech tagset (now only nouns, verbs, and adjectives are used)
     
 ## Authors
