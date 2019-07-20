@@ -2,15 +2,17 @@
 Load Wiktionary information from multiple languages into classes.Wiktionary object
 
 Usage:
-  load_wiktionary.py --config_path=<config_path> --output_folder=<output_folder> --verbose=<verbose>
+  load_wiktionary.py --config_path=<config_path> --min_num_senses=<min_num_senses>\
+  --output_folder=<output_folder> --verbose=<verbose>
 
 Options:
     --config_path=<config_path> see example 'config/en_it_du.json'
+    --min_num_senses=<min_num_senses> each word needs minimally x number of senses (can be 0)
     --output_folder=<output_folder>
     --verbose=<verbose> 0 --> no stdout 1 --> general stdout 2 --> detailed stdout
 
 Example:
-    python load_wiktionary.py --config_path="config/en_it_du.json" --output_folder="bin" --verbose="2"
+    python load_wiktionary.py --config_path="config/en_it_du.json" --min_num_senses="1" --output_folder="bin" --verbose="2"
 """
 import json
 import pickle
@@ -33,6 +35,7 @@ if out_folder.exists():
 out_folder.mkdir()
 output_path = out_folder / 'wiktionary_obj.p'
 verbose= int(arguments['--verbose'])
+min_num_senses = int(arguments['--min_num_senses'])
 
 settings = json.load(open(arguments['--config_path']))
 language2info = settings['language2info']
@@ -77,7 +80,6 @@ with open(settings['wikt_words_path']) as infile:
 
         key = (source_lang, lemma, fn_pos)
         lemma_obj = LemmaPos(namespace, short_namespace, lang, lemma, wikt_pos, fn_pos)
-        wikt_obj.lang_lemma_pos2lemma_pos_objs[key].append(lemma_obj)
 
         # senses
         if 'senses' in info:
@@ -120,6 +122,12 @@ with open(settings['wikt_words_path']) as infile:
                                                       gloss=translation_info['sense'])
 
                         lemma_obj.translations.append(translation_obj)
+
+
+
+        if len(lemma_obj.senses) >= min_num_senses:
+            wikt_obj.lang_lemma_pos2lemma_pos_objs[key].append(lemma_obj)
+
 
 wikt_obj.merge_lemma_objs()
 wikt_obj.create_translation_dict()
