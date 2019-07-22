@@ -1,5 +1,3 @@
 #!/usr/bin/env bash
-wiktwords resources/enwiktionary-latest-pages-articles.xml.bz2 --out output/wikt.english.words --language English --all --translations --linkages --compounds
-wiktwords resources/enwiktionary-latest-pages-articles.xml.bz2 --out output/wikt.dutch.words --language Dutch --all --translations --linkages --compounds
-wiktwords resources/enwiktionary-latest-pages-articles.xml.bz2 --out output/wikt.italian.words --language Italian --all --translations --linkages --compounds
+wiktwords resources/enwiktionary-latest-pages-articles.xml.bz2 --out output/wikt.en_du_it.words --language English --language Dutch --language Italian --translations  > output/log.out 2> output/log.err &
 

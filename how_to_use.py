@@ -9,3 +9,5 @@ with open(path, 'rb') as infile:
 print(wikt_obj.wikt_translations[('English', 'dictionary', 'N', 'Dutch')])
 print(wikt_obj.wikt_translations[('Dutch', 'woordenboek', 'N', 'English')])
 print(wikt_obj.wikt_translations[('English', 'dictionary', 'N', 'Italian')])
+print(wikt_obj.wikt_translations[('Dutch', 'zeilen', 'V', 'English')])
+

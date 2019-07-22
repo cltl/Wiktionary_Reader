@@ -127,6 +127,12 @@ with open(settings['wikt_words_path']) as infile:
 
         if len(lemma_obj.senses) >= min_num_senses:
             wikt_obj.lang_lemma_pos2lemma_pos_objs[key].append(lemma_obj)
+        else:
+            if verbose >= 3:
+                print()
+                print(f'NOT ENOUGH SENSES:')
+                print(lemma_obj)
+                input('continue?')
 
 
 wikt_obj.merge_lemma_objs()
